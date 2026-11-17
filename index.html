@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Fractured Clan Bingo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;600&display=swap">
+<style>
+:root{--bg:#0b0b0d;--panel:#101215;--line:#2d3237;--text:#e8ecdf;--muted:#aeb6a4;--accent:#b9a0ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,sans-serif}
+a{color:var(--muted);text-decoration:none}a:hover{color:#fff}
+header{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line)}
+header .brand{font:700 16px Cinzel,serif;color:#fff;margin-right:auto}
+nav{display:flex;gap:18px;flex-wrap:wrap;font:600 13px Inter,sans-serif}
+nav a{padding:6px 0;border-bottom:2px solid transparent}nav a.on{color:#fff;border-color:var(--accent)}
+main{max-width:1100px;margin:0 auto;padding:20px 12px 60px}
+h1{font:700 30px Cinzel,serif;text-align:center;margin:16px 0 6px;color:#fff}
+.sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:22px}
+.stats{display:flex;justify-content:center;gap:56px;margin-bottom:18px}
+.stat{text-align:center;font:600 11px Inter,sans-serif;color:var(--accent);letter-spacing:.1em}
+.stat b{display:block;font:600 30px Cinzel,serif;color:#fff;letter-spacing:0;margin-top:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{display:block;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:18px;color:var(--text)}
+.card:hover{border-color:var(--accent)}
+.card .rk{font:600 12px Inter,sans-serif;color:var(--accent);letter-spacing:.1em}
+.card h2{font:700 20px Cinzel,serif;margin:6px 0 2px;color:#fff}
+.card .meta{font-size:12px;color:var(--muted)}
+.card .pts{font:700 34px Cinzel,serif;color:#fff;margin:14px 0 2px}
+.card .row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
+.card .go{margin-top:12px;font:600 12px Inter,sans-serif;color:var(--accent)}
+#wrap{position:relative;margin:0 auto;width:100%}
+#board{position:absolute;left:0;top:0;width:1040px;height:806px;transform-origin:0 0}
+.t{position:absolute;width:74px;height:56px;border:1px solid #6b7560;border-radius:6px;background:#3a4234;color:var(--text);overflow:hidden;font:600 9.5px/11px Inter,sans-serif}
+.t img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.t .n{position:absolute;left:0;right:0;bottom:0;padding:9px 4px 3px;background:linear-gradient(transparent,rgba(0,0,0,.8));}
+.t .id{position:absolute;top:2px;left:4px;font:600 8px Inter,sans-serif;color:#d5dccb;text-shadow:0 0 3px #000}
+.t .p{position:absolute;right:3px;top:2px;background:#0b0b0d;border-radius:8px;padding:1px 5px;font:700 9px Inter,sans-serif}
+.t .ck{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(47,106,58,.55)}
+.t.done{border-color:#8fe09a;background:#2f6a3a}.t.done .ck{display:flex}
+.t.prog{border-color:#f0c648;background:#5a4d1c;box-shadow:0 0 0 1px #f0c648}
+.t.lock{background:#15171a;border-color:var(--line);color:#8a9096}.t.lock img{filter:grayscale(1) brightness(.4)}
+.t.unused{background:#15171a;border:1px dashed var(--line);color:#8a9096;opacity:.5}.t.unused img{filter:grayscale(1)}
+.t.bonus{background:#3b2a52;border-color:#b58be0}
+.core{position:absolute;left:400px;top:310px;width:240px;height:186px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.god{position:absolute;width:140px;font:700 12px/16px Cinzel,serif;letter-spacing:.08em}
+.god small{display:block;font:400 11px Inter,sans-serif;letter-spacing:0;color:var(--muted)}
+.cap{position:absolute;width:140px;font:400 10px/13px Inter,sans-serif;color:var(--muted)}.cap b{color:var(--text);font-weight:600}
+.lg{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-size:11px;color:var(--muted);margin-top:18px}
+.lg i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid;vertical-align:-2px;margin-right:6px}
+.msg{text-align:center;color:var(--muted);padding:40px 0}
+.foot{text-align:center;font-size:11px;color:var(--muted);margin-top:14px}
+</style>
+</head>
+<body>
+<header><span class="brand">THE FRACTURED CLAN BINGO</span><nav id="nav"></nav></header>
+<main id="app"><div class="msg">Loading…</div></main>
+<script>
+/* ===== CONFIG: edit these ===== */
+const BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7jseif23uhtjr8yLOtbufkDxdx1etDghB2MuyCf8OBIThsH0jIxBYXZJfOYwnIS-xRFc77avSx5Pk/pub';
+const GIDS = {teams:'2057076318', 1:'1917378951', 2:'1208448397', 3:'1914637158', 4:'1076229753'};
+const IMG_DIR = 'images/';      // tile art goes here, named by Tile ID in lowercase, e.g. images/sara-01.png
+const IMG_EXT = '.png';
+const REFRESH_MS = 60000;
+/* ================================ */
+const W=80,H=62,X0=0,Y0=0;
+const GODS={Saradomin:['SARA',0,[[4],[2,3,4],[1,2,3,4],[1,2,3,4],[0,1,2,3,4]],'#e0b43c',[0,0]],
+ Armadyl:['ARMA',0,[[8],[8,9,10],[8,9,10,11],[8,9,10,11],[8,9,10,11,12]],'#b9c6d6',[11,0]],
+ Bandos:['BAND',8,[[0,1,2,3,4],[1,2,3,4],[1,2,3,4],[2,3,4],[4]],'#a3b59a',[0,11]],
+ Zaros:['ZARO',8,[[8,9,10,11,12],[8,9,10,11],[8,9,10,11],[8,9,10],[8]],'#c39be0',[11,11]]};
+const STONES={COX:['top',6,[0,2,4],'Chambers of Xeric'],TOA:['right',null,[8,10,12],'Tombs of Amascut'],TFA:['bottom',6,[8,10,12],'TFA'],TOB:['left',null,[0,2,4],'Theatre of Blood']};
+const CAPS={COX:[7,1],TOA:[8,7],TFA:[7,9],TOB:[0,7]};
+const BONUS=[[5,5],[7,5],[5,7],[7,7]];
+let data=null,timer=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function parseCSV(t){const rows=[];let r=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];
+ if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+ else if(c==='"')q=true;else if(c===','){r.push(f);f=''}
+ else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(f);f='';if(r.length>1||r[0]!=='')rows.push(r);r=[]}
+ else f+=c}
+ if(f!==''||r.length){r.push(f);rows.push(r)}return rows}
+async function getCSV(gid){const res=await fetch(`${BASE}?gid=${gid}&single=true&output=csv&_=${Date.now()}`);if(!res.ok)throw new Error(res.status);return parseCSV(await res.text())}
+async function load(){
+ const [teamsCSV,...tabs]=await Promise.all([getCSV(GIDS.teams),...[1,2,3,4].map(n=>getCSV(GIDS[n]))]);
+ const teams=teamsCSV.slice(1).filter(r=>r[0]).map((r,i)=>({n:i+1,id:r[0],name:r[1]||r[0],god:r[2],dir:r[3],tiles:+r[4]||0,points:+r[5]||0,rank:+r[6]||0}));
+ teams.forEach((t,i)=>{t.rows=tabs[i].slice(1).filter(r=>r[3]).map(r=>({sec:r[1],type:r[2],id:r[3],name:r[4],pts:+r[5]||0,status:r[6],avail:r[7]}));
+  t.byId={};t.rows.forEach(x=>t.byId[x.id]=x);
+  t.quads=Object.keys(GODS).map(g=>{const rs=t.rows.filter(x=>x.sec===g);return{g,done:rs.filter(x=>x.status==='Complete').length,total:rs.length,open:rs.length>0&&rs[0].avail==='Open'}});
+  t.unlocked=t.quads.filter(q=>q.open).length});
+ data={teams,at:new Date()}}
+function nav(route){$('#nav').innerHTML=`<a href="#/" class="${route==='home'?'on':''}">Dashboard</a>`+(data?data.teams.map(t=>`<a href="#/team/${t.n}" class="${route==='t'+t.n?'on':''}">${esc(t.name)}</a>`).join(''):'')}
+function home(){
+ const ts=[...data.teams].sort((a,b)=>a.rank-b.rank||b.points-a.points);
+ $('#app').innerHTML=`<h1>Leaderboard</h1><div class="sub">Updated ${data.at.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} · refreshes every minute</div><div class="cards">`+ts.map(t=>`<a class="card" href="#/team/${t.n}"><div class="rk">RANK ${t.rank}</div><h2>${esc(t.name)}</h2><div class="meta">Started ${esc(t.god)} · ${esc(t.dir)}</div><div class="pts">${t.points}</div><div class="meta">POINTS</div><div class="row"><span>Tiles completed</span><b>${t.tiles}</b></div><div class="row"><span>Quadrants unlocked</span><b>${t.unlocked}/4</b></div><div class="go">View board →</div></a>`).join('')+`</div>`;
+}
+function cls(x){if(!x)return'lock';if(x.status==='Complete')return'done';if(x.status==='In progress')return'prog';if(x.avail==='Not on route')return'unused';if(x.avail==='Locked')return'lock';return'idle'}
+function tile(c,r,id,t,extra){const x=t.byId[id];if(!x)return'';const k=cls(x)+(extra&&k0(x)?' '+extra:'');
+ return `<div class="t ${k}" style="left:${X0+c*W}px;top:${Y0+r*H}px" role="img" aria-label="${esc(x.name)}, ${x.pts} points, ${esc(x.status)}, ${esc(x.avail)}" title="${esc(x.name)} · ${x.pts} pts · ${esc(x.status)}${x.avail!=='Open'?' ('+esc(x.avail)+')':''}"><img src="${IMG_DIR}${id.toLowerCase()}${IMG_EXT}" alt="" onerror="this.remove()"><span class="id">${esc(id.replace(/^[A-Z]+-/,''))}</span><span class="p">${x.pts}</span><span class="n">${esc(x.name)}</span><span class="ck"><svg width="26" height="26" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.5l2.6 2.6L10 3.4" fill="none" stroke="#fff" stroke-width="1.6"/></svg></span></div>`}
+function k0(x){return cls(x)==='idle'}
+function team(n){
+ const t=data.teams[n-1];if(!t){$('#app').innerHTML='<div class="msg">Team not found.</div>';return}
+ let h=`<h1>${esc(t.name)}</h1><div class="sub">Started ${esc(t.god)} · ${esc(t.dir)} · updated ${data.at.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div><div class="stats"><div class="stat">TILES<b>${t.tiles}</b></div><div class="stat">POINTS<b>${t.points}</b></div></div><div id="wrap"><div id="board"><div class="core"></div>`;
+ for(const [g,[p,r0,rows]] of Object.entries(GODS)){let i=0;rows.forEach((cols,ri)=>cols.forEach(c=>{i++;h+=tile(c,r0+ri,`${p}-${String(i).padStart(2,'0')}`,t)}))}
+ for(const [k,[side,fix,idx]] of Object.entries(STONES)){idx.forEach((v,j)=>{const c=(side==='top'||side==='bottom')?6:v,r=(side==='top'||side==='bottom')?v:6;h+=tile(c,r,`${k}-S${j+1}`,t)});
+  const s=t.byId[`${k}-S1`];const st=!s?'':s.avail==='Not on route'?'Not on route':s.avail==='Locked'?'Locked':'Open';const [cc,cr]=CAPS[k];h+=`<div class="cap" style="left:${cc*W}px;top:${cr*H}px"><b>${k} stones</b><br>${st}</div>`}
+ BONUS.forEach(([c,r],i)=>{h+=tile(c,r,`PET-Q${i+1}`,t,'bonus')});
+ t.quads.forEach(q=>{const [p,,,col,[c,r]]=GODS[q.g];const right=c>5;h+=`<div class="god" style="left:${c*W-(right?60:0)}px;top:${r*H+4}px;color:${col};text-align:${right?'right':'left'}">${q.g.toUpperCase()}<small>${q.done}/${q.total} · ${q.open?'Unlocked':'Locked'}</small></div>`});
+ h+=`</div></div><div class="lg"><span><i style="background:#3a4234;border-color:#6b7560"></i>Available</span><span><i style="background:#5a4d1c;border-color:#f0c648"></i>In progress</span><span><i style="background:#2f6a3a;border-color:#8fe09a"></i>Complete</span><span><i style="background:#15171a;border-color:#2d3237"></i>Locked</span><span><i style="background:#15171a;border:1px dashed #2d3237"></i>Not on route</span><span><i style="background:#3b2a52;border-color:#b58be0"></i>Bonus</span></div>`;
+ $('#app').innerHTML=h;fit()}
+function fit(){const w=$('#wrap');if(!w)return;const s=Math.min(1,w.clientWidth/1040);$('#board').style.transform=`scale(${s})`;w.style.height=(806*s)+'px'}
+function route(){const m=location.hash.match(/^#\/team\/(\d)$/);const r=m?'t'+m[1]:'home';
+ if(!data){return}nav(r);m?team(+m[1]):home();window.scrollTo(0,0)}
+async function refresh(first){try{await load();const keep=document.scrollingElement.scrollTop;nav();const m=location.hash.match(/^#\/team\/(\d)$/);nav(m?'t'+m[1]:'home');m?team(+m[1]):home();if(!first)window.scrollTo(0,keep)}catch(e){if(!data)$('#app').innerHTML='<div class="msg">Could not load the latest data. <a href="#" onclick="location.reload();return false">Try again</a></div>'}}
+window.addEventListener('hashchange',route);window.addEventListener('resize',fit);
+refresh(true);timer=setInterval(()=>refresh(false),REFRESH_MS);
+</script>
+</body>
+</html>
